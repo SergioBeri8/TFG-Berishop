@@ -5,6 +5,8 @@ import { AuthProvider, useAuth } from './context/AuthContext'
 import Login from './pages/Login'
 import Registro from './pages/Registro'
 import Home from './pages/Home'
+import CrearAnuncio from './pages/CrearAnuncio'
+import Catalogo from './pages/Catalogo'
 import './index.css'
 
 function RutaProtegida({ children }) {
@@ -21,6 +23,8 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/registro" element={<Registro />} />
           <Route path="/" element={<RutaProtegida><Home /></RutaProtegida>} />
+          <Route path="/crear-anuncio" element={<RutaProtegida><CrearAnuncio /></RutaProtegida>} />
+          <Route path="/catalogo" element={<RutaProtegida><Catalogo /></RutaProtegida>} />
         </Routes>
       </BrowserRouter>
     </AuthProvider>
