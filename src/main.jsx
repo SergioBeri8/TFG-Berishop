@@ -8,6 +8,7 @@ import Home from './pages/Home'
 import CrearAnuncio from './pages/CrearAnuncio'
 import Catalogo from './pages/Catalogo'
 import DetalleAnuncio from './pages/DetalleAnuncio'
+import MisPedidos from './pages/MisPedidos'
 import './index.css'
 
 function RutaProtegida({ children }) {
@@ -27,6 +28,7 @@ function App() {
           <Route path="/catalogo" element={<RutaProtegida><Catalogo /></RutaProtegida>} />
           <Route path="/crear-anuncio" element={<RutaProtegida><CrearAnuncio /></RutaProtegida>} />
           <Route path="/anuncio/:id" element={<RutaProtegida><DetalleAnuncio /></RutaProtegida>} />
+          <Route path="/mis-pedidos" element={<RutaProtegida><MisPedidos /></RutaProtegida>} />
         </Routes>
       </BrowserRouter>
     </AuthProvider>
