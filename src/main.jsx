@@ -7,6 +7,7 @@ import Registro from './pages/Registro'
 import Home from './pages/Home'
 import CrearAnuncio from './pages/CrearAnuncio'
 import Catalogo from './pages/Catalogo'
+import DetalleAnuncio from './pages/DetalleAnuncio'
 import './index.css'
 
 function RutaProtegida({ children }) {
@@ -23,8 +24,9 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/registro" element={<Registro />} />
           <Route path="/" element={<RutaProtegida><Home /></RutaProtegida>} />
-          <Route path="/crear-anuncio" element={<RutaProtegida><CrearAnuncio /></RutaProtegida>} />
           <Route path="/catalogo" element={<RutaProtegida><Catalogo /></RutaProtegida>} />
+          <Route path="/crear-anuncio" element={<RutaProtegida><CrearAnuncio /></RutaProtegida>} />
+          <Route path="/anuncio/:id" element={<RutaProtegida><DetalleAnuncio /></RutaProtegida>} />
         </Routes>
       </BrowserRouter>
     </AuthProvider>
