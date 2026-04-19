@@ -11,6 +11,7 @@ import DetalleAnuncio from './pages/DetalleAnuncio'
 import MisPedidos from './pages/MisPedidos'
 import PanelVendedor from './pages/PanelVendedor'
 import PanelAdmin from './pages/PanelAdmin'
+import ResetPassword from './pages/ResetPassword'
 import './index.css'
 
 function RutaProtegida({ children }) {
@@ -26,6 +27,7 @@ function App() {
         <Routes>
           <Route path="/login" element={<Login />} />
           <Route path="/registro" element={<Registro />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/" element={<RutaProtegida><Home /></RutaProtegida>} />
           <Route path="/catalogo" element={<RutaProtegida><Catalogo /></RutaProtegida>} />
           <Route path="/crear-anuncio" element={<RutaProtegida><CrearAnuncio /></RutaProtegida>} />
