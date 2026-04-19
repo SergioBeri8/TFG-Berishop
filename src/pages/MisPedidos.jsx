@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { supabase } from '../supabase'
 import { useAuth } from '../context/AuthContext'
 import { useNavigate } from 'react-router-dom'
+import Navbar from '../components/Navbar'
 
 export default function MisPedidos() {
   const { user } = useAuth()
@@ -39,15 +40,11 @@ export default function MisPedidos() {
   if (loading) return <div className="min-h-screen flex items-center justify-center">Cargando...</div>
 
   return (
-    <div className="min-h-screen bg-gray-100 py-10 px-4">
+  <div className="min-h-screen bg-gray-100">
+    <Navbar />
+    <div className="py-10 px-4">
       <div className="max-w-3xl mx-auto">
-        <div className="flex justify-between items-center mb-8">
-          <h1 className="text-3xl font-bold">Mis pedidos</h1>
-          <button onClick={() => navigate('/catalogo')}
-            className="text-sm text-gray-500 hover:text-black">
-            ← Volver al catálogo
-          </button>
-        </div>
+        <h1 className="text-3xl font-bold mb-8">Mis pedidos</h1>
 
         {pedidos.length === 0 ? (
           <div className="text-center text-gray-500 mt-20">
@@ -84,5 +81,6 @@ export default function MisPedidos() {
         )}
       </div>
     </div>
-  )
+  </div>
+)
 }

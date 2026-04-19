@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { supabase } from '../supabase'
 import { useAuth } from '../context/AuthContext'
+import Navbar from '../components/Navbar'
+
 
 export default function DetalleAnuncio() {
   const { id } = useParams()
@@ -59,7 +61,9 @@ export default function DetalleAnuncio() {
   if (!anuncio) return <div className="min-h-screen flex items-center justify-center">Anuncio no encontrado</div>
 
   return (
-    <div className="min-h-screen bg-gray-100 py-10 px-4">
+  <div className="min-h-screen bg-gray-100">
+    <Navbar />
+    <div className="py-10 px-4">
       <div className="max-w-lg mx-auto bg-white rounded-xl shadow-md p-8">
         <button onClick={() => navigate('/catalogo')}
           className="text-sm text-gray-500 hover:text-black mb-6 inline-block">
@@ -110,5 +114,6 @@ export default function DetalleAnuncio() {
         )}
       </div>
     </div>
-  )
+  </div>
+)
 }

@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { supabase } from '../supabase'
 import { useAuth } from '../context/AuthContext'
 import { useNavigate } from 'react-router-dom'
+import Navbar from '../components/Navbar'
 
 export default function CrearAnuncio() {
   const { user } = useAuth()
@@ -55,7 +56,9 @@ export default function CrearAnuncio() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-100 py-10 px-4">
+  <div className="min-h-screen bg-gray-100">
+    <Navbar />
+    <div className="py-10 px-4">
       <div className="max-w-lg mx-auto bg-white rounded-xl shadow-md p-8">
         <h1 className="text-2xl font-bold mb-6">Publicar anuncio</h1>
         {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
@@ -93,5 +96,6 @@ export default function CrearAnuncio() {
         </form>
       </div>
     </div>
-  )
+  </div>
+)
 }

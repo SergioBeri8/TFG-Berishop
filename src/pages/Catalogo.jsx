@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { supabase } from '../supabase'
 import { useNavigate } from 'react-router-dom'
+import Navbar from '../components/Navbar'
 
 export default function Catalogo() {
   const [anuncios, setAnuncios] = useState([])
@@ -27,7 +28,9 @@ export default function Catalogo() {
   if (loading) return <div className="min-h-screen flex items-center justify-center">Cargando...</div>
 
   return (
-    <div className="min-h-screen bg-gray-100 py-10 px-4">
+  <div className="min-h-screen bg-gray-100">
+    <Navbar />
+    <div className="py-10 px-4">
       <div className="max-w-6xl mx-auto">
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-3xl font-bold">Catálogo</h1>
@@ -74,5 +77,6 @@ export default function Catalogo() {
         )}
       </div>
     </div>
-  )
+  </div>
+)
 }
