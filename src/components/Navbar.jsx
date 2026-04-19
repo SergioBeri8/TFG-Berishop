@@ -3,7 +3,7 @@ import { useAuth } from '../context/AuthContext'
 import { supabase } from '../supabase'
 
 export default function Navbar() {
-  const { user } = useAuth()
+  const { user, perfil } = useAuth()
   const navigate = useNavigate()
 
   async function handleLogout() {
@@ -33,6 +33,22 @@ export default function Navbar() {
         >
           Mis pedidos
         </button>
+        {perfil?.rol === 'VENDEDOR' || perfil?.rol === 'ADMIN' ? (
+          <button
+            onClick={() => navigate('/panel-vendedor')}
+            className="text-sm text-gray-600 hover:text-black transition"
+          >
+            Mis anuncios
+          </button>
+        ) : null}
+        {perfil?.rol === 'ADMIN' && (
+          <button
+            onClick={() => navigate('/panel-admin')}
+            className="text-sm text-gray-600 hover:text-black transition"
+          >
+            Admin
+          </button>
+        )}
         <button
           onClick={() => navigate('/crear-anuncio')}
           className="text-sm bg-black text-white px-4 py-2 rounded-lg hover:bg-gray-800 transition"
