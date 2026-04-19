@@ -10,6 +10,7 @@ import Catalogo from './pages/Catalogo'
 import DetalleAnuncio from './pages/DetalleAnuncio'
 import MisPedidos from './pages/MisPedidos'
 import PanelVendedor from './pages/PanelVendedor'
+import PanelAdmin from './pages/PanelAdmin'
 import './index.css'
 
 function RutaProtegida({ children }) {
@@ -31,6 +32,7 @@ function App() {
           <Route path="/anuncio/:id" element={<RutaProtegida><DetalleAnuncio /></RutaProtegida>} />
           <Route path="/mis-pedidos" element={<RutaProtegida><MisPedidos /></RutaProtegida>} />
           <Route path="/panel-vendedor" element={<RutaProtegida><PanelVendedor /></RutaProtegida>} />
+          <Route path="/panel-admin" element={<RutaProtegida><PanelAdmin /></RutaProtegida>} />
         </Routes>
       </BrowserRouter>
     </AuthProvider>
