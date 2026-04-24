@@ -12,6 +12,7 @@ import MisPedidos from './pages/MisPedidos'
 import PanelVendedor from './pages/PanelVendedor'
 import PanelAdmin from './pages/PanelAdmin'
 import ResetPassword from './pages/ResetPassword'
+import Perfil from './pages/Perfil'
 import './index.css'
 
 function RutaProtegida({ children }) {
@@ -35,6 +36,7 @@ function App() {
           <Route path="/mis-pedidos" element={<RutaProtegida><MisPedidos /></RutaProtegida>} />
           <Route path="/panel-vendedor" element={<RutaProtegida><PanelVendedor /></RutaProtegida>} />
           <Route path="/panel-admin" element={<RutaProtegida><PanelAdmin /></RutaProtegida>} />
+          <Route path="/perfil" element={<RutaProtegida><Perfil /></RutaProtegida>} />
         </Routes>
       </BrowserRouter>
     </AuthProvider>

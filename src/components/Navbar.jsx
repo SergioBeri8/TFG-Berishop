@@ -55,7 +55,12 @@ export default function Navbar() {
         >
           + Publicar
         </button>
-        <span className="text-sm text-gray-400">{user?.email}</span>
+        <button
+        onClick={() => navigate('/perfil')}
+        className="text-sm text-gray-600 hover:text-black transition"
+        >
+         {user?.email}
+        </button>
         <button
           onClick={handleLogout}
           className="text-sm text-gray-600 hover:text-black transition"
