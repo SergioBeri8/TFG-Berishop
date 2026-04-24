@@ -9,6 +9,9 @@ export default function PanelVendedor() {
   const navigate = useNavigate()
   const [anuncios, setAnuncios] = useState([])
   const [loading, setLoading] = useState(true)
+  const [editando, setEditando] = useState(null)
+  const [nuevoPrecio, setNuevoPrecio] = useState('')
+  const [nuevoEstado, setNuevoEstado] = useState('')
 
   useEffect(() => {
     async function cargarAnuncios() {
@@ -24,9 +27,29 @@ export default function PanelVendedor() {
     cargarAnuncios()
   }, [user.id])
 
-  async function handleDesactivar(id) {
-    await supabase.from('anuncios').update({ estado: 'VENDIDO' }).eq('id', id)
-    setAnuncios(anuncios.map(a => a.id === id ? { ...a, estado: 'VENDIDO' } : a))
+  async function handleEditar(anuncio) {
+    setEditando(anuncio.id)
+    setNuevoPrecio(anuncio.precio)
+    setNuevoEstado(anuncio.estado)
+  }
+
+  async function handleGuardarEdicion(id) {
+    await supabase
+      .from('anuncios')
+      .update({ precio: parseFloat(nuevoPrecio), estado: nuevoEstado })
+      .eq('id', id)
+
+    setAnuncios(anuncios.map(a => a.id === id
+      ? { ...a, precio: parseFloat(nuevoPrecio), estado: nuevoEstado }
+      : a
+    ))
+    setEditando(null)
+  }
+
+  async function handleEliminar(id) {
+    if (!confirm('¿Seguro que quieres eliminar este anuncio?')) return
+    await supabase.from('anuncios').delete().eq('id', id)
+    setAnuncios(anuncios.filter(a => a.id !== id))
   }
 
   const estadoColor = {
@@ -61,25 +84,70 @@ export default function PanelVendedor() {
           ) : (
             <div className="flex flex-col gap-4">
               {anuncios.map(anuncio => (
-                <div key={anuncio.id} className="bg-white rounded-xl shadow-md p-6 flex justify-between items-center">
-                  <div>
-                    <p className="text-sm text-gray-500">{anuncio.productos?.marca}</p>
-                    <h2 className="text-lg font-bold">{anuncio.productos?.nombre}</h2>
-                    <p className="text-sm text-gray-500">{anuncio.productos?.modelo} — Talla {anuncio.talla}</p>
-                    <p className="text-sm text-gray-400 mt-1">{anuncio.estado_conservacion.replace(/_/g, ' ')}</p>
-                  </div>
-                  <div className="text-right flex flex-col items-end gap-2">
-                    <p className="text-2xl font-bold">{anuncio.precio} €</p>
-                    <span className={`text-xs px-2 py-1 rounded-full ${estadoColor[anuncio.estado]}`}>
-                      {anuncio.estado}
-                    </span>
-                    {anuncio.estado === 'ACTIVO' && (
-                      <button onClick={() => handleDesactivar(anuncio.id)}
-                        className="text-xs text-red-500 hover:text-red-700 transition">
-                        Desactivar
-                      </button>
-                    )}
-                  </div>
+                <div key={anuncio.id} className="bg-white rounded-xl shadow-md p-6">
+                  {editando === anuncio.id ? (
+                    <div className="flex flex-col gap-3">
+                      <p className="font-bold">{anuncio.productos?.marca} — {anuncio.productos?.nombre}</p>
+                      <div className="flex gap-3 items-center">
+                        <div className="flex flex-col gap-1">
+                          <label className="text-xs text-gray-500">Precio (€)</label>
+                          <input
+                            type="number"
+                            value={nuevoPrecio}
+                            onChange={e => setNuevoPrecio(e.target.value)}
+                            className="border rounded-lg p-2 w-32 focus:outline-none focus:ring-2 focus:ring-black"
+                          />
+                        </div>
+                        <div className="flex flex-col gap-1">
+                          <label className="text-xs text-gray-500">Estado</label>
+                          <select
+                            value={nuevoEstado}
+                            onChange={e => setNuevoEstado(e.target.value)}
+                            className="border rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-black"
+                          >
+                            <option value="ACTIVO">Activo</option>
+                            <option value="RESERVADO">Reservado</option>
+                            <option value="VENDIDO">Vendido</option>
+                          </select>
+                        </div>
+                      </div>
+                      <div className="flex gap-2">
+                        <button onClick={() => handleGuardarEdicion(anuncio.id)}
+                          className="bg-black text-white rounded-lg px-4 py-2 text-sm font-semibold hover:bg-gray-800 transition">
+                          Guardar
+                        </button>
+                        <button onClick={() => setEditando(null)}
+                          className="border rounded-lg px-4 py-2 text-sm hover:bg-gray-50 transition">
+                          Cancelar
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="flex justify-between items-center">
+                      <div>
+                        <p className="text-sm text-gray-500">{anuncio.productos?.marca}</p>
+                        <h2 className="text-lg font-bold">{anuncio.productos?.nombre}</h2>
+                        <p className="text-sm text-gray-500">{anuncio.productos?.modelo} — Talla {anuncio.talla}</p>
+                        <p className="text-sm text-gray-400 mt-1">{anuncio.estado_conservacion.replace(/_/g, ' ')}</p>
+                      </div>
+                      <div className="text-right flex flex-col items-end gap-2">
+                        <p className="text-2xl font-bold">{anuncio.precio} €</p>
+                        <span className={`text-xs px-2 py-1 rounded-full ${estadoColor[anuncio.estado]}`}>
+                          {anuncio.estado}
+                        </span>
+                        <div className="flex gap-2 mt-1">
+                          <button onClick={() => handleEditar(anuncio)}
+                            className="text-xs border rounded-lg px-3 py-1 hover:bg-gray-50 transition">
+                            Editar
+                          </button>
+                          <button onClick={() => handleEliminar(anuncio.id)}
+                            className="text-xs text-red-500 border border-red-200 rounded-lg px-3 py-1 hover:bg-red-50 transition">
+                            Eliminar
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  )}
                 </div>
               ))}
             </div>
