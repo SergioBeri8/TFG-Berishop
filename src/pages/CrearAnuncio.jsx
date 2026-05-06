@@ -14,18 +14,21 @@ export default function CrearAnuncio() {
   const [nombre, setNombre] = useState('')
   const [modelo, setModelo] = useState('')
   const [referencia, setReferencia] = useState('')
+  const [descripcion, setDescripcion] = useState('')
   const [talla, setTalla] = useState('')
   const [precio, setPrecio] = useState('')
   const [conservacion, setConservacion] = useState('NUEVO')
-  const [imagen, setImagen] = useState(null)
-  const [preview, setPreview] = useState(null)
+  const [imagenes, setImagenes] = useState([])
+  const [previews, setPreviews] = useState([])
 
-  function handleImagen(e) {
-    const file = e.target.files[0]
-    if (file) {
-      setImagen(file)
-      setPreview(URL.createObjectURL(file))
+  function handleImagenes(e) {
+    const files = Array.from(e.target.files)
+    if (files.length > 5) {
+      alert('Máximo 5 imágenes')
+      return
     }
+    setImagenes(files)
+    setPreviews(files.map(f => URL.createObjectURL(f)))
   }
 
   async function handleSubmit(e) {
@@ -35,7 +38,7 @@ export default function CrearAnuncio() {
 
     const { data: producto, error: errorProducto } = await supabase
       .from('productos')
-      .insert({ nombre, marca, modelo, referencia })
+      .insert({ nombre, marca, modelo, referencia, descripcion})
       .select()
       .single()
 
@@ -46,12 +49,13 @@ export default function CrearAnuncio() {
     }
 
     let imagen_url = null
-    if (imagen) {
-      const extension = imagen.name.split('.').pop()
-      const path = `${user.id}/${producto.id}.${extension}`
+
+    if (imagenes.length > 0) {
+      const extension = imagenes[0].name.split('.').pop()
+      const path = `${user.id}/${producto.id}_0.${extension}`
       const { error: errorStorage } = await supabase.storage
         .from('anuncios')
-        .upload(path, imagen)
+        .upload(path, imagenes[0])
 
       if (!errorStorage) {
         const { data: urlData } = supabase.storage
@@ -61,7 +65,7 @@ export default function CrearAnuncio() {
       }
     }
 
-    const { error: errorAnuncio } = await supabase
+    const { data: anuncio, error: errorAnuncio } = await supabase
       .from('anuncios')
       .insert({
         producto_id: producto.id,
@@ -72,11 +76,34 @@ export default function CrearAnuncio() {
         estado: 'ACTIVO',
         imagen_url
       })
+      .select()
+      .single()
 
     if (errorAnuncio) {
       setError('Error al crear el anuncio')
       setLoading(false)
       return
+    }
+
+    if (imagenes.length > 0) {
+      for (let i = 0; i < imagenes.length; i++) {
+        const ext = imagenes[i].name.split('.').pop()
+        const path = `${user.id}/${anuncio.id}_${i}.${ext}`
+        const { error: errImg } = await supabase.storage
+          .from('anuncios')
+          .upload(path, imagenes[i])
+
+        if (!errImg) {
+          const { data: urlData } = supabase.storage
+            .from('anuncios')
+            .getPublicUrl(path)
+          await supabase.from('imagenes_anuncio').insert({
+            anuncio_id: anuncio.id,
+            url: urlData.publicUrl,
+            orden: i
+          })
+        }
+      }
     }
 
     navigate('/catalogo')
@@ -102,6 +129,13 @@ export default function CrearAnuncio() {
             <input type="text" placeholder="Referencia (ej: CW2288-111)" value={referencia}
               onChange={e => setReferencia(e.target.value)}
               className="border rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-black" />
+              <textarea
+  placeholder="Descripción (estado de las suelas, defectos, historia del artículo...)"
+  value={descripcion}
+  onChange={e => setDescripcion(e.target.value)}
+  rows={3}
+  className="border rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-black resize-none"
+/>
             <input type="number" placeholder="Talla (ej: 42)" min="34" max="50" value={talla}
               onChange={e => setTalla(e.target.value)}
               className="border rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-black" required />
@@ -118,14 +152,19 @@ export default function CrearAnuncio() {
             </select>
 
             <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center cursor-pointer hover:border-black transition"
-              onClick={() => document.getElementById('input-imagen').click()}>
-              {preview ? (
-                <img src={preview} alt="preview" className="max-h-48 mx-auto rounded-lg object-cover" />
+              onClick={() => document.getElementById('input-imagenes').click()}>
+              {previews.length > 0 ? (
+                <div className="grid grid-cols-3 gap-2">
+                  {previews.map((src, i) => (
+                    <img key={i} src={src} alt={`preview ${i}`}
+                      className="w-full h-24 object-contain rounded-lg bg-gray-50" />
+                  ))}
+                </div>
               ) : (
-                <p className="text-gray-400 text-sm">Haz clic para subir una foto</p>
+                <p className="text-gray-400 text-sm">Haz clic para subir fotos (máx. 5)</p>
               )}
-              <input id="input-imagen" type="file" accept="image/*"
-                onChange={handleImagen} className="hidden" />
+              <input id="input-imagenes" type="file" accept="image/*" multiple
+                onChange={handleImagenes} className="hidden" />
             </div>
 
             <button type="submit" disabled={loading}
