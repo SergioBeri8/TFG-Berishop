@@ -94,6 +94,7 @@ export default function PanelVendedor() {
                           <input
                             type="number"
                             value={nuevoPrecio}
+                            min="1"
                             onChange={e => setNuevoPrecio(e.target.value)}
                             className="border rounded-lg p-2 w-32 focus:outline-none focus:ring-2 focus:ring-black"
                           />

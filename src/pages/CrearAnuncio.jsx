@@ -102,10 +102,10 @@ export default function CrearAnuncio() {
             <input type="text" placeholder="Referencia (ej: CW2288-111)" value={referencia}
               onChange={e => setReferencia(e.target.value)}
               className="border rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-black" />
-            <input type="number" placeholder="Talla (ej: 42)" value={talla}
+            <input type="number" placeholder="Talla (ej: 42)" min="34" max="50" value={talla}
               onChange={e => setTalla(e.target.value)}
               className="border rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-black" required />
-            <input type="number" placeholder="Precio (€)" value={precio}
+            <input type="number" placeholder="Precio (€)" min="1" value={precio}
               onChange={e => setPrecio(e.target.value)}
               className="border rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-black" required />
             <select value={conservacion} onChange={e => setConservacion(e.target.value)}

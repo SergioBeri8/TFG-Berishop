@@ -111,14 +111,16 @@ export default function DetalleAnuncio() {
                     ) : (
                         <>
                             {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
-                            {anuncio.estado === 'ACTIVO' ? (
-                                <button onClick={handleComprar} disabled={comprando}
-                                    className="w-full bg-black text-white rounded-lg py-3 font-semibold hover:bg-gray-800 transition disabled:opacity-50">
-                                    {comprando ? 'Procesando...' : 'Comprar ahora'}
-                                </button>
-                            ) : (
-                                <p className="text-center text-gray-500 font-semibold">Este artículo ya no está disponible</p>
-                            )}
+                            {anuncio.vendedor_id === user.id ? (
+  <p className="text-center text-gray-500 font-semibold">Este es tu anuncio</p>
+) : anuncio.estado === 'ACTIVO' ? (
+  <button onClick={handleComprar} disabled={comprando}
+    className="w-full bg-black text-white rounded-lg py-3 font-semibold hover:bg-gray-800 transition disabled:opacity-50">
+    {comprando ? 'Procesando...' : 'Comprar ahora'}
+  </button>
+) : (
+  <p className="text-center text-gray-500 font-semibold">Este artículo ya no está disponible</p>
+)}
                         </>
                     )}
                 </div>
