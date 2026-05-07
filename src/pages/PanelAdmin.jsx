@@ -13,14 +13,41 @@ export default function PanelAdmin() {
       .select(`
         *,
         anuncios (
-          id, talla, precio, estado_conservacion,
+          id, talla, vendedor_id,
           productos (nombre, marca, modelo)
-        ),
-        usuarios!pedidos_comprador_id_fkey (nombre, email)
+        )
       `)
       .order('fecha_pedido', { ascending: false })
 
-    if (!error) setPedidos(data)
+    if (!error) {
+      const pedidosConUsuarios = await Promise.all(data.map(async (pedido) => {
+        const { data: comprador } = await supabase
+          .from('usuarios')
+          .select('nombre, email')
+          .eq('id', pedido.comprador_id)
+          .single()
+
+        const { data: vendedor } = await supabase
+          .from('usuarios')
+          .select('nombre, email')
+          .eq('id', pedido.anuncios?.vendedor_id)
+          .single()
+
+        return {
+          ...pedido,
+          comprador_nombre: comprador?.nombre,
+          comprador_email: comprador?.email,
+          vendedor_nombre: vendedor?.nombre,
+          vendedor_email: vendedor?.email,
+          anuncio_tabla_id: pedido.anuncios?.id,
+          producto_marca: pedido.anuncios?.productos?.marca,
+          producto_nombre: pedido.anuncios?.productos?.nombre,
+          producto_modelo: pedido.anuncios?.productos?.modelo,
+          talla: pedido.anuncios?.talla
+        }
+      }))
+      setPedidos(pedidosConUsuarios)
+    }
     setLoading(false)
   }, [])
 
@@ -43,18 +70,12 @@ export default function PanelAdmin() {
     const pedido = pedidos.find(p => p.id === pedidoId)
 
     if (resultado === 'APROBADO') {
-      await supabase.from('anuncios').update({ estado: 'VENDIDO' }).eq('id', pedido.anuncios?.id)
+      await supabase.from('anuncios').update({ estado: 'VENDIDO' }).eq('id', pedido.anuncio_tabla_id)
     }
 
-    const { data: compradorData } = await supabase
-      .from('usuarios')
-      .select('email')
-      .eq('id', pedido.comprador_id)
-      .single()
-
     await enviarEmailVerificacion({
-      emailComprador: compradorData?.email,
-      producto: `${pedido.anuncios?.productos?.marca} ${pedido.anuncios?.productos?.nombre}`,
+      emailComprador: pedido.comprador_email,
+      producto: `${pedido.producto_marca} ${pedido.producto_nombre}`,
       resultado
     })
 
@@ -87,11 +108,14 @@ export default function PanelAdmin() {
                 <div key={pedido.id} className="bg-white rounded-xl shadow-md p-6">
                   <div className="flex justify-between items-start">
                     <div>
-                      <p className="text-sm text-gray-500">{pedido.anuncios?.productos?.marca}</p>
-                      <h2 className="text-lg font-bold">{pedido.anuncios?.productos?.nombre}</h2>
-                      <p className="text-sm text-gray-500">{pedido.anuncios?.productos?.modelo} — Talla {pedido.anuncios?.talla}</p>
-                      <p className="text-sm text-gray-400 mt-1">
-                        Comprador: {pedido.usuarios?.nombre} ({pedido.usuarios?.email})
+                      <p className="text-sm text-gray-500">{pedido.producto_marca}</p>
+                      <h2 className="text-lg font-bold">{pedido.producto_nombre}</h2>
+                      <p className="text-sm text-gray-500">{pedido.producto_modelo} — Talla {pedido.talla}</p>
+                      <p className="text-sm text-gray-400 mt-2">
+                        <span className="font-medium">Comprador:</span> {pedido.comprador_nombre} ({pedido.comprador_email})
+                      </p>
+                      <p className="text-sm text-gray-400">
+                        <span className="font-medium">Vendedor:</span> {pedido.vendedor_nombre} ({pedido.vendedor_email})
                       </p>
                       <p className="text-xs text-gray-400 mt-1">
                         {new Date(pedido.fecha_pedido).toLocaleDateString('es-ES')}
