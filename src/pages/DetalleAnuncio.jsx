@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { supabase } from '../supabase'
 import { useAuth } from '../context/AuthContext'
 import Navbar from '../components/Navbar'
+import { enviarEmailPedido } from '../utils/email'
 
 export default function DetalleAnuncio() {
   const { id } = useParams()
@@ -67,6 +68,19 @@ export default function DetalleAnuncio() {
       .update({ estado: 'RESERVADO' })
       .eq('id', anuncio.id)
 
+    const { data: vendedorData } = await supabase
+  .from('usuarios')
+  .select('email')
+  .eq('id', anuncio.vendedor_id)
+  .single()
+
+await enviarEmailPedido({
+  emailComprador: user.email,
+  emailVendedor: vendedorData?.email,
+  producto: `${anuncio.productos?.marca} ${anuncio.productos?.nombre}`,
+  precio: anuncio.precio,
+  talla: anuncio.talla
+})
     setExito(true)
     setComprando(false)
   }

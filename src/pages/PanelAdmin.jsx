@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { supabase } from '../supabase'
 import Navbar from '../components/Navbar'
+import { enviarEmailVerificacion } from '../utils/email'
 
 export default function PanelAdmin() {
   const [pedidos, setPedidos] = useState([])
@@ -26,7 +27,7 @@ export default function PanelAdmin() {
     cargarPedidos()
   }, [])
 
-  async function handleVerificar(pedidoId, resultado) {
+ async function handleVerificar(pedidoId, resultado) {
     const { data: { user } } = await supabase.auth.getUser()
 
     await supabase.from('verificaciones').insert({
@@ -38,10 +39,23 @@ export default function PanelAdmin() {
     const nuevoEstado = resultado === 'APROBADO' ? 'COMPLETADO' : 'CANCELADO'
     await supabase.from('pedidos').update({ estado: nuevoEstado }).eq('id', pedidoId)
 
+    const pedido = pedidos.find(p => p.id === pedidoId)
+
     if (resultado === 'APROBADO') {
-      const pedido = pedidos.find(p => p.id === pedidoId)
       await supabase.from('anuncios').update({ estado: 'VENDIDO' }).eq('id', pedido.anuncios?.id)
     }
+
+    const { data: compradorData } = await supabase
+      .from('usuarios')
+      .select('email')
+      .eq('id', pedido.comprador_id)
+      .single()
+
+    await enviarEmailVerificacion({
+      emailComprador: compradorData?.email,
+      producto: `${pedido.anuncios?.productos?.marca} ${pedido.anuncios?.productos?.nombre}`,
+      resultado
+    })
 
     setPedidos(pedidos.map(p => p.id === pedidoId ? { ...p, estado: nuevoEstado } : p))
   }
