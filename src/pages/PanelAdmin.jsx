@@ -7,25 +7,26 @@ export default function PanelAdmin() {
   const [pedidos, setPedidos] = useState([])
   const [loading, setLoading] = useState(true)
 
-  useEffect(() => {
-    async function cargarPedidos() {
-      const { data, error } = await supabase
-        .from('pedidos')
-        .select(`
-          *,
-          anuncios (
-            talla, precio, estado_conservacion,
-            productos (nombre, marca, modelo)
-          ),
-          usuarios!pedidos_comprador_id_fkey (nombre, email)
-        `)
-        .order('fecha_pedido', { ascending: false })
+useEffect(() => {
+  cargarPedidos()
+}, [])
 
-      if (!error) setPedidos(data)
-      setLoading(false)
-    }
-    cargarPedidos()
-  }, [])
+async function cargarPedidos() {
+  const { data, error } = await supabase
+    .from('pedidos')
+    .select(`
+      *,
+      anuncios (
+        id, talla, precio, estado_conservacion,
+        productos (nombre, marca, modelo)
+      ),
+      usuarios!pedidos_comprador_id_fkey (nombre, email)
+    `)
+    .order('fecha_pedido', { ascending: false })
+
+  if (!error) setPedidos(data)
+  setLoading(false)
+}
 
  async function handleVerificar(pedidoId, resultado) {
     const { data: { user } } = await supabase.auth.getUser()
@@ -56,8 +57,7 @@ export default function PanelAdmin() {
       producto: `${pedido.anuncios?.productos?.marca} ${pedido.anuncios?.productos?.nombre}`,
       resultado
     })
-
-    setPedidos(pedidos.map(p => p.id === pedidoId ? { ...p, estado: nuevoEstado } : p))
+      await cargarPedidos()
   }
 
   const estadoColor = {
