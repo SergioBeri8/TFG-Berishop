@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { supabase } from '../supabase'
 import Navbar from '../components/Navbar'
 import { enviarEmailVerificacion } from '../utils/email'
@@ -7,28 +7,28 @@ export default function PanelAdmin() {
   const [pedidos, setPedidos] = useState([])
   const [loading, setLoading] = useState(true)
 
-useEffect(() => {
-  cargarPedidos()
-}, [])
+  const cargarPedidos = useCallback(async () => {
+    const { data, error } = await supabase
+      .from('pedidos')
+      .select(`
+        *,
+        anuncios (
+          id, talla, precio, estado_conservacion,
+          productos (nombre, marca, modelo)
+        ),
+        usuarios!pedidos_comprador_id_fkey (nombre, email)
+      `)
+      .order('fecha_pedido', { ascending: false })
 
-async function cargarPedidos() {
-  const { data, error } = await supabase
-    .from('pedidos')
-    .select(`
-      *,
-      anuncios (
-        id, talla, precio, estado_conservacion,
-        productos (nombre, marca, modelo)
-      ),
-      usuarios!pedidos_comprador_id_fkey (nombre, email)
-    `)
-    .order('fecha_pedido', { ascending: false })
+    if (!error) setPedidos(data)
+    setLoading(false)
+  }, [])
 
-  if (!error) setPedidos(data)
-  setLoading(false)
-}
+  useEffect(() => {
+    cargarPedidos()
+  }, [cargarPedidos])
 
- async function handleVerificar(pedidoId, resultado) {
+  async function handleVerificar(pedidoId, resultado) {
     const { data: { user } } = await supabase.auth.getUser()
 
     await supabase.from('verificaciones').insert({
@@ -57,7 +57,8 @@ async function cargarPedidos() {
       producto: `${pedido.anuncios?.productos?.marca} ${pedido.anuncios?.productos?.nombre}`,
       resultado
     })
-      await cargarPedidos()
+
+    await cargarPedidos()
   }
 
   const estadoColor = {
