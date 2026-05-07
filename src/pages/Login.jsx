@@ -36,6 +36,15 @@ export default function Login() {
     }
   }
 
+  async function handleGoogle() {
+  await supabase.auth.signInWithOAuth({
+    provider: 'google',
+    options: {
+      redirectTo: 'https://tfg-berishop.vercel.app/catalogo'
+    }
+  })
+}
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100">
       <div className="bg-white p-8 rounded-xl shadow-md w-full max-w-md">
@@ -73,6 +82,13 @@ export default function Login() {
           >
             ¿Olvidaste tu contraseña?
           </button>
+          <button
+  onClick={handleGoogle}
+  className="w-full border rounded-lg p-3 font-semibold hover:bg-gray-50 transition flex items-center justify-center gap-2"
+>
+  <img src="https://www.google.com/favicon.ico" alt="Google" className="w-4 h-4" />
+  Continuar con Google
+</button>
           <p className="text-sm">
             ¿No tienes cuenta?{' '}
             <a href="/registro" className="font-semibold underline">Regístrate</a>
