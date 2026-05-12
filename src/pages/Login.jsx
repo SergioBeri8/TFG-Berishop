@@ -77,18 +77,19 @@ export default function Login() {
         </form>
         <div className="text-center mt-4 flex flex-col gap-2">
           <button
-            onClick={handleRecuperar}
-            className="text-sm text-gray-500 hover:text-black transition"
-          >
-            ¿Olvidaste tu contraseña?
-          </button>
-          <button
   onClick={handleGoogle}
   className="w-full border rounded-lg p-3 font-semibold hover:bg-gray-50 transition flex items-center justify-center gap-2"
 >
   <img src="https://www.google.com/favicon.ico" alt="Google" className="w-4 h-4" />
   Continuar con Google
 </button>
+          <button
+            onClick={handleRecuperar}
+            className="text-sm text-gray-500 hover:text-black transition"
+          >
+            ¿Olvidaste tu contraseña?
+          </button>
+          
           <p className="text-sm">
             ¿No tienes cuenta?{' '}
             <a href="/registro" className="font-semibold underline">Regístrate</a>

@@ -19,8 +19,6 @@ export default function PanelAdmin() {
       `)
       .order('fecha_pedido', { ascending: false })
 
-    console.log('Pedidos cargados:', data?.map(p => ({ id: p.id, estado: p.estado })))
-
     if (!error) {
       const pedidosConUsuarios = await Promise.all(data.map(async (pedido) => {
         const { data: comprador } = await supabase
@@ -58,23 +56,20 @@ export default function PanelAdmin() {
   }, [cargarPedidos])
 
   async function handleVerificar(pedidoId, resultado) {
-    console.log('1. Iniciando verificacion')
     const { data: { user } } = await supabase.auth.getUser()
-    console.log('2. Usuario admin:', user?.id)
 
-    const { error: errorVerif } = await supabase.from('verificaciones').insert({
+    await supabase.from('verificaciones').insert({
       pedido_id: pedidoId,
       admin_id: user.id,
       resultado
     })
-    console.log('3. Verificacion insertada, error:', errorVerif)
 
     const nuevoEstado = resultado === 'APROBADO' ? 'COMPLETADO' : 'CANCELADO'
-    const { error: errorPedido } = await supabase.from('pedidos').update({ estado: nuevoEstado }).eq('id', pedidoId)
-    console.log('4. Pedido actualizado, error:', errorPedido)
+    await supabase.from('pedidos').update({ estado: nuevoEstado }).eq('id', pedidoId)
 
     const pedido = pedidos.find(p => p.id === pedidoId)
-    console.log('5. Pedido encontrado:', pedido?.id)
+
+    await supabase.from('anuncios').update({ estado: 'VENDIDO' }).eq('id', pedido.anuncio_tabla_id)
 
     await enviarEmailVerificacion({
       emailComprador: pedido.comprador_email,
@@ -82,9 +77,7 @@ export default function PanelAdmin() {
       resultado
     })
 
-    console.log('6. Recargando pedidos...')
     await cargarPedidos()
-    console.log('7. Pedidos recargados')
   }
 
   const estadoColor = {
