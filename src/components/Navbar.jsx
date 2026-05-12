@@ -33,14 +33,12 @@ export default function Navbar() {
         >
           Mis pedidos
         </button>
-        {perfil?.rol === 'VENDEDOR' || perfil?.rol === 'ADMIN' ? (
-          <button
-            onClick={() => navigate('/panel-vendedor')}
-            className="text-sm text-gray-600 hover:text-black transition"
-          >
-            Mis anuncios
-          </button>
-        ) : null}
+        <button
+  onClick={() => navigate('/panel-vendedor')}
+  className="text-sm text-gray-600 hover:text-black transition"
+>
+  Mis anuncios
+</button>
         {perfil?.rol === 'ADMIN' && (
           <button
             onClick={() => navigate('/panel-admin')}
