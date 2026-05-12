@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { supabase } from '../supabase'
 import { useNavigate } from 'react-router-dom'
 import Navbar from '../components/Navbar'
@@ -13,22 +13,24 @@ export default function Catalogo() {
     const [precioMax, setPrecioMax] = useState('')
     const navigate = useNavigate()
 
-    useEffect(() => {
-        async function cargarAnuncios() {
-            const { data, error } = await supabase
-                .from('anuncios')
-                .select(`*, productos (nombre, marca, modelo)`)
-                .eq('estado', 'ACTIVO')
-                .order('created_at', { ascending: false })
+    const cargarAnuncios = useCallback(async () => {
+        const { data, error } = await supabase
+            .from('anuncios')
+            .select(`*, productos (nombre, marca, modelo)`)
+            .eq('estado', 'ACTIVO')
+            .order('created_at', { ascending: false })
 
-            if (!error) {
-                setAnuncios(data)
-                setFiltrados(data)
-            }
-            setLoading(false)
+        if (!error) {
+            setAnuncios(data)
         }
-        cargarAnuncios()
+        setLoading(false)
     }, [])
+
+    useEffect(() => {
+        cargarAnuncios()
+        const intervalo = setInterval(cargarAnuncios, 10000)
+        return () => clearInterval(intervalo)
+    }, [cargarAnuncios])
 
     useEffect(() => {
         let resultado = anuncios
@@ -153,7 +155,7 @@ export default function Catalogo() {
                                 <div key={anuncio.id} className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition">
                                     {anuncio.imagen_url ? (
                                         <img src={anuncio.imagen_url} alt={anuncio.productos?.nombre}
-                                            className="w-full h-48 object-cover" />
+                                            className="w-full h-48 object-contain bg-gray-50" />
                                     ) : (
                                         <div className="w-full h-48 bg-gray-100 flex items-center justify-center">
                                             <span className="text-gray-400 text-sm">Sin imagen</span>

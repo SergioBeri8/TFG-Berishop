@@ -81,6 +81,7 @@ await enviarEmailPedido({
   precio: anuncio.precio,
   talla: anuncio.talla
 })
+    setTimeout(() => navigate('/catalogo'), 3000)
     setExito(true)
     setComprando(false)
   }
