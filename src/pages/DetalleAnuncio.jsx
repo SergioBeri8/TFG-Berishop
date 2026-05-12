@@ -12,6 +12,7 @@ export default function DetalleAnuncio() {
   const [anuncio, setAnuncio] = useState(null)
   const [imagenes, setImagenes] = useState([])
   const [imagenActual, setImagenActual] = useState(0)
+  const [vendedor, setVendedor] = useState(null)
   const [loading, setLoading] = useState(true)
   const [comprando, setComprando] = useState(false)
   const [error, setError] = useState(null)
@@ -37,6 +38,15 @@ export default function DetalleAnuncio() {
         setImagenes(imgs)
       } else if (data?.imagen_url) {
         setImagenes([{ url: data.imagen_url }])
+      }
+
+      if (data?.vendedor_id) {
+        const { data: vendedorData } = await supabase
+          .from('usuarios')
+          .select('id, nombre, avatar_url')
+          .eq('id', data.vendedor_id)
+          .single()
+        setVendedor(vendedorData)
       }
 
       setLoading(false)
@@ -69,21 +79,22 @@ export default function DetalleAnuncio() {
       .eq('id', anuncio.id)
 
     const { data: vendedorData } = await supabase
-  .from('usuarios')
-  .select('email')
-  .eq('id', anuncio.vendedor_id)
-  .single()
+      .from('usuarios')
+      .select('email')
+      .eq('id', anuncio.vendedor_id)
+      .single()
 
-await enviarEmailPedido({
-  emailComprador: user.email,
-  emailVendedor: vendedorData?.email,
-  producto: `${anuncio.productos?.marca} ${anuncio.productos?.nombre}`,
-  precio: anuncio.precio,
-  talla: anuncio.talla
-})
-    setTimeout(() => navigate('/catalogo'), 3000)
+    await enviarEmailPedido({
+      emailComprador: user.email,
+      emailVendedor: vendedorData?.email,
+      producto: `${anuncio.productos?.marca} ${anuncio.productos?.nombre}`,
+      precio: anuncio.precio,
+      talla: anuncio.talla
+    })
+
     setExito(true)
     setComprando(false)
+    setTimeout(() => navigate('/catalogo'), 3000)
   }
 
   if (loading) return <div className="min-h-screen flex items-center justify-center">Cargando...</div>
@@ -131,11 +142,29 @@ await enviarEmailPedido({
             <p className="text-gray-600 mb-4">{anuncio.productos.descripcion}</p>
           )}
 
-          <div className="flex gap-4 mb-6">
+          <div className="flex gap-4 mb-4">
             <span className="bg-gray-100 px-3 py-1 rounded-full text-sm">Talla {anuncio.talla}</span>
             <span className="bg-gray-100 px-3 py-1 rounded-full text-sm">{anuncio.estado_conservacion.replace(/_/g, ' ')}</span>
             <span className="bg-gray-100 px-3 py-1 rounded-full text-sm">{anuncio.estado}</span>
           </div>
+
+          {vendedor && (
+            <div
+              onClick={() => navigate(`/usuario/${vendedor.id}`)}
+              className="flex items-center gap-3 mb-4 cursor-pointer hover:opacity-80 transition bg-gray-50 rounded-lg p-3"
+            >
+              {vendedor.avatar_url ? (
+                <img src={vendedor.avatar_url} alt={vendedor.nombre}
+                  className="w-8 h-8 rounded-full object-cover" />
+              ) : (
+                <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center">
+                  <span className="text-sm">👤</span>
+                </div>
+              )}
+              <span className="text-sm text-gray-600">Vendido por <span className="font-semibold text-black">{vendedor.nombre}</span></span>
+              <span className="text-xs text-gray-400 ml-auto">Ver perfil →</span>
+            </div>
+          )}
 
           <p className="text-4xl font-bold mb-8">{anuncio.precio} €</p>
 
