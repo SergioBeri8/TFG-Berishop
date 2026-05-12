@@ -48,6 +48,12 @@ export default function Navbar() {
           </button>
         )}
         <button
+  onClick={() => navigate('/vendedores')}
+  className="text-sm text-gray-600 hover:text-black transition"
+>
+  Vendedores
+</button>
+        <button
           onClick={() => navigate('/crear-anuncio')}
           className="text-sm bg-black text-white px-4 py-2 rounded-lg hover:bg-gray-800 transition"
         >

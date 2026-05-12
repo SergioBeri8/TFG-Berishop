@@ -136,7 +136,7 @@ export default function CrearAnuncio() {
   rows={3}
   className="border rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-black resize-none"
 />
-            <input type="number" placeholder="Talla (ej: 42)" min="34" max="50" value={talla}
+            <input type="number" placeholder="Talla (ej: 42)" min="34" max="50" step="0.5" value={talla}
               onChange={e => setTalla(e.target.value)}
               className="border rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-black" required />
             <input type="number" placeholder="Precio (€)" min="1" value={precio}

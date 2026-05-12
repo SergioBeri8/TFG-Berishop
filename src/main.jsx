@@ -15,6 +15,7 @@ import ResetPassword from './pages/ResetPassword'
 import Perfil from './pages/Perfil'
 import PerfilPublico from './pages/PerfilPublico'
 import DejarValoracion from './pages/DejarValoracion'
+import BuscadorUsuarios from './pages/BuscadorUsuarios'
 import './index.css'
 
 function RutaProtegida({ children }) {
@@ -41,6 +42,7 @@ function App() {
           <Route path="/panel-admin" element={<RutaProtegida><PanelAdmin /></RutaProtegida>} />
           <Route path="/perfil" element={<RutaProtegida><Perfil /></RutaProtegida>} />
           <Route path="/valorar/:pedidoId" element={<RutaProtegida><DejarValoracion /></RutaProtegida>} />
+          <Route path="/vendedores" element={<RutaProtegida><BuscadorUsuarios /></RutaProtegida>} />
         </Routes>
       </BrowserRouter>
     </AuthProvider>

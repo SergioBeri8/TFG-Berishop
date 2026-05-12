@@ -11,6 +11,7 @@ export default function Catalogo() {
     const [marcaFiltro, setMarcaFiltro] = useState('')
     const [tallaFiltro, setTallaFiltro] = useState('')
     const [precioMax, setPrecioMax] = useState('')
+    const [orden, setOrden] = useState('recientes')
     const navigate = useNavigate()
 
     const cargarAnuncios = useCallback(async () => {
@@ -58,8 +59,16 @@ export default function Catalogo() {
             resultado = resultado.filter(a => a.precio <= parseFloat(precioMax))
         }
 
+        if (orden === 'precio_asc') {
+            resultado = [...resultado].sort((a, b) => a.precio - b.precio)
+        } else if (orden === 'precio_desc') {
+            resultado = [...resultado].sort((a, b) => b.precio - a.precio)
+        } else if (orden === 'talla_asc') {
+            resultado = [...resultado].sort((a, b) => a.talla - b.talla)
+        }
+
         setFiltrados(resultado)
-    }, [busqueda, marcaFiltro, tallaFiltro, precioMax, anuncios])
+    }, [busqueda, marcaFiltro, tallaFiltro, precioMax, orden, anuncios])
 
     const marcas = [...new Set(anuncios.map(a => a.productos?.marca).filter(Boolean))]
 
@@ -68,6 +77,7 @@ export default function Catalogo() {
         setMarcaFiltro('')
         setTallaFiltro('')
         setPrecioMax('')
+        setOrden('recientes')
     }
 
     if (loading) return <div className="min-h-screen flex items-center justify-center">Cargando...</div>
@@ -116,6 +126,7 @@ export default function Catalogo() {
                             <input
                                 type="number"
                                 placeholder="Ej: 42"
+                                step="0.5"
                                 value={tallaFiltro}
                                 onChange={e => setTallaFiltro(e.target.value)}
                                 className="border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-black w-24"
@@ -130,6 +141,19 @@ export default function Catalogo() {
                                 onChange={e => setPrecioMax(e.target.value)}
                                 className="border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-black w-32"
                             />
+                        </div>
+                        <div className="flex flex-col gap-1">
+                            <label className="text-xs text-gray-500">Ordenar por</label>
+                            <select
+                                value={orden}
+                                onChange={e => setOrden(e.target.value)}
+                                className="border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-black w-40"
+                            >
+                                <option value="recientes">Más recientes</option>
+                                <option value="precio_asc">Precio: menor a mayor</option>
+                                <option value="precio_desc">Precio: mayor a menor</option>
+                                <option value="talla_asc">Talla: menor a mayor</option>
+                            </select>
                         </div>
                         <button
                             onClick={limpiarFiltros}
