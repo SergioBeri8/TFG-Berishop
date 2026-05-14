@@ -6,6 +6,7 @@ import { enviarEmailVerificacion } from '../utils/email'
 export default function PanelAdmin() {
   const [pedidos, setPedidos] = useState([])
   const [loading, setLoading] = useState(true)
+  const [comisionTotal, setComisionTotal] = useState(0)
 
   const cargarPedidos = useCallback(async () => {
     const { data, error } = await supabase
@@ -47,6 +48,11 @@ export default function PanelAdmin() {
         }
       }))
       setPedidos(pedidosConUsuarios)
+
+      const total = pedidosConUsuarios
+        .filter(p => p.estado === 'COMPLETADO')
+        .reduce((sum, p) => sum + (p.comision || 0), 0)
+      setComisionTotal(parseFloat(total.toFixed(2)))
     }
     setLoading(false)
   }, [])
@@ -68,6 +74,26 @@ export default function PanelAdmin() {
     await supabase.from('pedidos').update({ estado: nuevoEstado }).eq('id', pedidoId)
 
     const pedido = pedidos.find(p => p.id === pedidoId)
+
+    if (resultado === 'APROBADO') {
+      const comision = parseFloat((pedido.precio_final * 0.08).toFixed(2))
+      const importeVendedor = parseFloat((pedido.precio_final - comision).toFixed(2))
+
+      await supabase.from('pedidos').update({
+        comision,
+        importe_vendedor: importeVendedor
+      }).eq('id', pedidoId)
+
+      const { data: vendedorActual } = await supabase
+        .from('usuarios')
+        .select('saldo')
+        .eq('id', pedido.anuncios?.vendedor_id)
+        .single()
+
+      await supabase.from('usuarios').update({
+        saldo: (vendedorActual?.saldo || 0) + importeVendedor
+      }).eq('id', pedido.anuncios?.vendedor_id)
+    }
 
     await supabase.from('anuncios').update({ estado: 'VENDIDO' }).eq('id', pedido.anuncio_tabla_id)
 
@@ -94,7 +120,14 @@ export default function PanelAdmin() {
       <Navbar />
       <div className="py-10 px-4">
         <div className="max-w-5xl mx-auto">
-          <h1 className="text-3xl font-bold mb-8">Panel de administración</h1>
+          <div className="flex justify-between items-center mb-8">
+            <h1 className="text-3xl font-bold">Panel de administración</h1>
+            <div className="bg-white rounded-xl shadow-md px-6 py-4 text-right">
+              <p className="text-xs text-gray-500">Comisiones recaudadas</p>
+              <p className="text-2xl font-bold text-green-600">{comisionTotal} €</p>
+              <p className="text-xs text-gray-400">8% por venta</p>
+            </div>
+          </div>
 
           {pedidos.length === 0 ? (
             <div className="text-center text-gray-500 mt-20">
@@ -121,6 +154,12 @@ export default function PanelAdmin() {
                     </div>
                     <div className="text-right flex flex-col items-end gap-2">
                       <p className="text-2xl font-bold">{pedido.precio_final} €</p>
+                      {pedido.estado === 'COMPLETADO' && pedido.comision > 0 && (
+                        <div className="text-xs text-gray-400">
+                          <p>Comisión: {pedido.comision} €</p>
+                          <p>Vendedor recibe: {pedido.importe_vendedor} €</p>
+                        </div>
+                      )}
                       <span className={`text-xs px-2 py-1 rounded-full ${estadoColor[pedido.estado]}`}>
                         {pedido.estado.replace('_', ' ')}
                       </span>

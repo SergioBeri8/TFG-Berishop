@@ -60,10 +60,16 @@ export default function Navbar() {
           + Publicar
         </button>
         <button
-        onClick={() => navigate('/perfil')}
-        className="text-sm text-gray-600 hover:text-black transition"
+          onClick={() => navigate('/perfil')}
+          className="flex items-center gap-2 hover:opacity-80 transition"
         >
-         {user?.email}
+          {perfil?.avatar_url ? (
+            <img src={perfil.avatar_url} alt="perfil" className="w-8 h-8 rounded-full object-cover border border-gray-200" />
+          ) : (
+            <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center">
+              <span className="text-sm">👤</span>
+            </div>
+          )}
         </button>
         <button
           onClick={handleLogout}
