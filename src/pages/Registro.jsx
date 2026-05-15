@@ -26,46 +26,80 @@ export default function Registro() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="bg-white p-8 rounded-xl shadow-md w-full max-w-md">
-        <h1 className="text-2xl font-bold mb-6 text-center">Crear cuenta</h1>
-        {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
-        <form onSubmit={handleRegistro} className="flex flex-col gap-4">
-          <input
-            type="text"
-            placeholder="Nombre completo"
-            value={nombre}
-            onChange={e => setNombre(e.target.value)}
-            className="border rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-black"
-            required
-          />
-          <input
-            type="email"
-            placeholder="Email"
-            value={email}
-            onChange={e => setEmail(e.target.value)}
-            className="border rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-black"
-            required
-          />
-          <input
-            type="password"
-            placeholder="Contraseña"
-            value={password}
-            onChange={e => setPassword(e.target.value)}
-            className="border rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-black"
-            required
-          />
-          <button
-            type="submit"
-            className="bg-black text-white rounded-lg p-3 font-semibold hover:bg-gray-800 transition"
-          >
-            Registrarse
-          </button>
-        </form>
-        <p className="text-center text-sm mt-4">
-          ¿Ya tienes cuenta?{' '}
-          <a href="/login" className="font-semibold underline">Inicia sesión</a>
-        </p>
+    <div className="min-h-screen flex">
+      {/* Lado izquierdo */}
+      <div className="hidden lg:flex w-1/2 bg-black flex-col justify-between p-12">
+        <span className="text-white font-bold text-2xl tracking-widest">BERISHOP</span>
+        <div>
+          <h1 className="text-white text-5xl font-bold leading-tight mb-4">
+            Únete a la<br />comunidad<br />sneaker.
+          </h1>
+          <p className="text-gray-400 text-lg">Miles de zapatillas exclusivas te esperan.</p>
+        </div>
+        <p className="text-gray-600 text-sm">© 2026 Berishop</p>
+      </div>
+
+      {/* Lado derecho */}
+      <div className="w-full lg:w-1/2 flex items-center justify-center bg-gray-50 px-8">
+        <div className="w-full max-w-md">
+          <div className="lg:hidden mb-8">
+            <span className="text-black font-bold text-2xl tracking-widest">BERISHOP</span>
+          </div>
+
+          <h2 className="text-3xl font-bold mb-2">Crear cuenta</h2>
+          <p className="text-gray-500 mb-8">Empieza a comprar y vender hoy</p>
+
+          {error && <p className="text-red-500 text-sm mb-4 bg-red-50 p-3 rounded-lg">{error}</p>}
+
+          <form onSubmit={handleRegistro} className="flex flex-col gap-4 mb-6">
+            <div>
+              <label className="text-sm font-medium text-gray-700 mb-1 block">Nombre completo</label>
+              <input
+                type="text"
+                placeholder="Tu nombre"
+                value={nombre}
+                onChange={e => setNombre(e.target.value)}
+                className="border border-gray-300 rounded-lg p-3 w-full focus:outline-none focus:ring-2 focus:ring-black bg-white"
+                required
+              />
+            </div>
+            <div>
+              <label className="text-sm font-medium text-gray-700 mb-1 block">Email</label>
+              <input
+                type="email"
+                placeholder="tu@email.com"
+                value={email}
+                onChange={e => setEmail(e.target.value)}
+                className="border border-gray-300 rounded-lg p-3 w-full focus:outline-none focus:ring-2 focus:ring-black bg-white"
+                required
+              />
+            </div>
+            <div>
+              <label className="text-sm font-medium text-gray-700 mb-1 block">Contraseña</label>
+              <input
+                type="password"
+                placeholder="Mínimo 6 caracteres"
+                value={password}
+                onChange={e => setPassword(e.target.value)}
+                className="border border-gray-300 rounded-lg p-3 w-full focus:outline-none focus:ring-2 focus:ring-black bg-white"
+                required
+              />
+            </div>
+            <button
+              type="submit"
+              className="bg-black text-white rounded-lg p-3 font-semibold hover:bg-gray-800 transition mt-2"
+            >
+              Crear cuenta
+            </button>
+          </form>
+
+          <p className="text-center text-sm text-gray-500">
+            ¿Ya tienes cuenta?{' '}
+            <span onClick={() => navigate('/login')} className="font-semibold text-black cursor-pointer hover:underline">
+              Inicia sesión
+            </span>
+          </p>
+        </div>
       </div>
     </div>
   )
