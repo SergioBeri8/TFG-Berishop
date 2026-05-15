@@ -176,7 +176,7 @@ export default function Catalogo() {
                     ) : (
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                             {filtrados.map(anuncio => (
-                                <div key={anuncio.id} className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition">
+                                <div key={anuncio.id} className="bg-white rounded-2xl shadow-sm overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
                                     {anuncio.imagen_url ? (
                                         <img src={anuncio.imagen_url} alt={anuncio.productos?.nombre}
                                             className="w-full h-48 object-contain bg-gray-50" />
@@ -202,8 +202,7 @@ export default function Catalogo() {
                                         </div>
                                         <button
                                             onClick={() => navigate(`/anuncio/${anuncio.id}`)}
-                                            className="mt-4 w-full bg-black text-white rounded-lg py-2 font-semibold hover:bg-gray-800 transition"
-                                        >
+className="mt-4 w-full bg-black text-white rounded-xl py-2.5 font-semibold hover:bg-gray-900 transition tracking-wide text-sm"                                        >
                                             Ver detalle
                                         </button>
                                     </div>
