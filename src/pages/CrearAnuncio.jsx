@@ -14,10 +14,10 @@ export default function CrearAnuncio() {
   const [nombre, setNombre] = useState('')
   const [modelo, setModelo] = useState('')
   const [referencia, setReferencia] = useState('')
-  const [descripcion, setDescripcion] = useState('')
   const [talla, setTalla] = useState('')
   const [precio, setPrecio] = useState('')
   const [conservacion, setConservacion] = useState('NUEVO')
+  const [descripcion, setDescripcion] = useState('')
   const [imagenes, setImagenes] = useState([])
   const [previews, setPreviews] = useState([])
 
@@ -38,7 +38,7 @@ export default function CrearAnuncio() {
 
     const { data: producto, error: errorProducto } = await supabase
       .from('productos')
-      .insert({ nombre, marca, modelo, referencia, descripcion})
+      .insert({ nombre, marca, modelo, referencia, descripcion })
       .select()
       .single()
 
@@ -58,9 +58,7 @@ export default function CrearAnuncio() {
         .upload(path, imagenes[0])
 
       if (!errorStorage) {
-        const { data: urlData } = supabase.storage
-          .from('anuncios')
-          .getPublicUrl(path)
+        const { data: urlData } = supabase.storage.from('anuncios').getPublicUrl(path)
         imagen_url = urlData.publicUrl
       }
     }
@@ -89,14 +87,9 @@ export default function CrearAnuncio() {
       for (let i = 0; i < imagenes.length; i++) {
         const ext = imagenes[i].name.split('.').pop()
         const path = `${user.id}/${anuncio.id}_${i}.${ext}`
-        const { error: errImg } = await supabase.storage
-          .from('anuncios')
-          .upload(path, imagenes[i])
-
+        const { error: errImg } = await supabase.storage.from('anuncios').upload(path, imagenes[i])
         if (!errImg) {
-          const { data: urlData } = supabase.storage
-            .from('anuncios')
-            .getPublicUrl(path)
+          const { data: urlData } = supabase.storage.from('anuncios').getPublicUrl(path)
           await supabase.from('imagenes_anuncio').insert({
             anuncio_id: anuncio.id,
             url: urlData.publicUrl,
@@ -110,69 +103,111 @@ export default function CrearAnuncio() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className="min-h-screen bg-gray-50">
       <Navbar />
-      <div className="py-10 px-4">
-        <div className="max-w-lg mx-auto bg-white rounded-xl shadow-md p-8">
-          <h1 className="text-2xl font-bold mb-6">Publicar anuncio</h1>
-          {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
-          <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-            <input type="text" placeholder="Marca (ej: Nike)" value={marca}
-              onChange={e => setMarca(e.target.value)}
-              className="border rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-black" required />
-            <input type="text" placeholder="Nombre (ej: Air Force 1)" value={nombre}
-              onChange={e => setNombre(e.target.value)}
-              className="border rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-black" required />
-            <input type="text" placeholder="Modelo" value={modelo}
-              onChange={e => setModelo(e.target.value)}
-              className="border rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-black" required />
-            <input type="text" placeholder="Referencia (ej: CW2288-111)" value={referencia}
-              onChange={e => setReferencia(e.target.value)}
-              className="border rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-black" />
-              <textarea
-  placeholder="Descripción (estado de las suelas, defectos, historia del artículo...)"
-  value={descripcion}
-  onChange={e => setDescripcion(e.target.value)}
-  rows={3}
-  className="border rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-black resize-none"
-/>
-            <input type="number" placeholder="Talla (ej: 42)" min="34" max="50" step="0.5" value={talla}
-              onChange={e => setTalla(e.target.value)}
-              className="border rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-black" required />
-            <input type="number" placeholder="Precio (€)" min="1" value={precio}
-              onChange={e => setPrecio(e.target.value)}
-              className="border rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-black" required />
-            <select value={conservacion} onChange={e => setConservacion(e.target.value)}
-              className="border rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-black">
-              <option value="NUEVO">Nuevo</option>
-              <option value="COMO_NUEVO">Como nuevo</option>
-              <option value="BUENAS_CONDICIONES">Buenas condiciones</option>
-              <option value="USADO">Usado</option>
-              <option value="MUY_USADO">Muy usado</option>
-            </select>
+      <div className="max-w-2xl mx-auto py-10 px-4">
+        <h1 className="text-3xl font-bold mb-2">Publicar anuncio</h1>
+        <p className="text-gray-500 mb-8">Rellena los datos de tu zapatilla</p>
 
-            <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center cursor-pointer hover:border-black transition"
+        {error && <p className="text-red-500 text-sm mb-4 bg-red-50 p-3 rounded-xl">{error}</p>}
+
+        <form onSubmit={handleSubmit} className="flex flex-col gap-5">
+
+          <div className="bg-white rounded-2xl shadow-sm p-6 flex flex-col gap-4">
+            <h2 className="font-semibold text-gray-700">Información del producto</h2>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="text-xs font-medium text-gray-500 mb-1 block">Marca</label>
+                <input type="text" placeholder="Nike, Adidas..." value={marca}
+                  onChange={e => setMarca(e.target.value)}
+                  className="border border-gray-200 rounded-xl p-3 w-full focus:outline-none focus:ring-2 focus:ring-black bg-gray-50" required />
+              </div>
+              <div>
+                <label className="text-xs font-medium text-gray-500 mb-1 block">Nombre</label>
+                <input type="text" placeholder="Air Force 1, Dunk..." value={nombre}
+                  onChange={e => setNombre(e.target.value)}
+                  className="border border-gray-200 rounded-xl p-3 w-full focus:outline-none focus:ring-2 focus:ring-black bg-gray-50" required />
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="text-xs font-medium text-gray-500 mb-1 block">Modelo</label>
+                <input type="text" placeholder="Low, High..." value={modelo}
+                  onChange={e => setModelo(e.target.value)}
+                  className="border border-gray-200 rounded-xl p-3 w-full focus:outline-none focus:ring-2 focus:ring-black bg-gray-50" required />
+              </div>
+              <div>
+                <label className="text-xs font-medium text-gray-500 mb-1 block">Referencia (opcional)</label>
+                <input type="text" placeholder="CW2288-111" value={referencia}
+                  onChange={e => setReferencia(e.target.value)}
+                  className="border border-gray-200 rounded-xl p-3 w-full focus:outline-none focus:ring-2 focus:ring-black bg-gray-50" />
+              </div>
+            </div>
+            <div>
+              <label className="text-xs font-medium text-gray-500 mb-1 block">Descripción (opcional)</label>
+              <textarea placeholder="Estado de las suelas, defectos, historia del artículo..." value={descripcion}
+                onChange={e => setDescripcion(e.target.value)} rows={3}
+                className="border border-gray-200 rounded-xl p-3 w-full focus:outline-none focus:ring-2 focus:ring-black bg-gray-50 resize-none" />
+            </div>
+          </div>
+
+          <div className="bg-white rounded-2xl shadow-sm p-6 flex flex-col gap-4">
+            <h2 className="font-semibold text-gray-700">Detalles de venta</h2>
+            <div className="grid grid-cols-3 gap-4">
+              <div>
+                <label className="text-xs font-medium text-gray-500 mb-1 block">Talla</label>
+                <input type="number" placeholder="42" min="34" max="50" step="0.5" value={talla}
+                  onChange={e => setTalla(e.target.value)}
+                  className="border border-gray-200 rounded-xl p-3 w-full focus:outline-none focus:ring-2 focus:ring-black bg-gray-50" required />
+              </div>
+              <div>
+                <label className="text-xs font-medium text-gray-500 mb-1 block">Precio (€)</label>
+                <input type="number" placeholder="150" min="1" value={precio}
+                  onChange={e => setPrecio(e.target.value)}
+                  className="border border-gray-200 rounded-xl p-3 w-full focus:outline-none focus:ring-2 focus:ring-black bg-gray-50" required />
+              </div>
+              <div>
+                <label className="text-xs font-medium text-gray-500 mb-1 block">Estado</label>
+                <select value={conservacion} onChange={e => setConservacion(e.target.value)}
+                  className="border border-gray-200 rounded-xl p-3 w-full focus:outline-none focus:ring-2 focus:ring-black bg-gray-50">
+                  <option value="NUEVO">Nuevo</option>
+                  <option value="COMO_NUEVO">Como nuevo</option>
+                  <option value="BUENAS_CONDICIONES">Buenas condiciones</option>
+                  <option value="USADO">Usado</option>
+                  <option value="MUY_USADO">Muy usado</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-white rounded-2xl shadow-sm p-6">
+            <h2 className="font-semibold text-gray-700 mb-4">Fotos (máx. 5)</h2>
+            <div className="border-2 border-dashed border-gray-200 rounded-2xl p-6 text-center cursor-pointer hover:border-black transition"
               onClick={() => document.getElementById('input-imagenes').click()}>
               {previews.length > 0 ? (
-                <div className="grid grid-cols-3 gap-2">
+                <div className="grid grid-cols-5 gap-2">
                   {previews.map((src, i) => (
                     <img key={i} src={src} alt={`preview ${i}`}
-                      className="w-full h-24 object-contain rounded-lg bg-gray-50" />
+                      className="w-full aspect-square object-contain rounded-xl bg-gray-50" />
                   ))}
                 </div>
               ) : (
-                <p className="text-gray-400 text-sm">Haz clic para subir fotos (máx. 5)</p>
+                <div>
+                  <p className="text-4xl mb-2">📸</p>
+                  <p className="text-gray-500 font-medium">Haz clic para subir fotos</p>
+                  <p className="text-gray-400 text-sm mt-1">JPG, PNG — máximo 5 imágenes</p>
+                </div>
               )}
               <input id="input-imagenes" type="file" accept="image/*" multiple
                 onChange={handleImagenes} className="hidden" />
             </div>
+          </div>
 
-            <button type="submit" disabled={loading}
-              className="bg-black text-white rounded-lg p-3 font-semibold hover:bg-gray-800 transition disabled:opacity-50">
-              {loading ? 'Publicando...' : 'Publicar anuncio'}
-            </button>
-          </form>
-        </div>
+          <button type="submit" disabled={loading}
+            className="bg-black text-white rounded-2xl p-4 font-bold text-lg hover:bg-gray-900 transition disabled:opacity-50 tracking-wide">
+            {loading ? 'Publicando...' : 'Publicar anuncio'}
+          </button>
+        </form>
       </div>
     </div>
   )
