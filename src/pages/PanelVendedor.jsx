@@ -85,6 +85,21 @@ export default function PanelVendedor() {
       }
     }
 
+    const { data: todasImagenes } = await supabase
+  .from('imagenes_anuncio')
+  .select('url')
+  .eq('anuncio_id', anuncioId)
+  .order('orden')
+  .limit(1)
+  .single()
+
+if (todasImagenes) {
+  await supabase
+    .from('anuncios')
+    .update({ imagen_url: todasImagenes.url })
+    .eq('id', anuncioId)
+}
+
     setAnuncios(anuncios.map(a => a.id === anuncioId
       ? { ...a, precio: parseFloat(nuevoPrecio), estado: nuevoEstado }
       : a
