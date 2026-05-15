@@ -12,6 +12,9 @@ export default function PanelVendedor() {
   const [editando, setEditando] = useState(null)
   const [nuevoPrecio, setNuevoPrecio] = useState('')
   const [nuevoEstado, setNuevoEstado] = useState('')
+  const [nuevaTalla, setNuevaTalla] = useState('')
+const [nuevaConservacion, setNuevaConservacion] = useState('')
+const [nuevaDescripcion, setNuevaDescripcion] = useState('')
   const [nuevasImagenes, setNuevasImagenes] = useState([])
   const [previews, setPreviews] = useState([])
   const [imagenesActuales, setImagenesActuales] = useState([])
@@ -34,6 +37,9 @@ export default function PanelVendedor() {
     setEditando(anuncio.id)
     setNuevoPrecio(anuncio.precio)
     setNuevoEstado(anuncio.estado)
+    setNuevaTalla(anuncio.talla)
+setNuevaConservacion(anuncio.estado_conservacion)
+setNuevaDescripcion(anuncio.productos?.descripcion || '')
     setNuevasImagenes([])
     setPreviews([])
 
@@ -60,8 +66,14 @@ export default function PanelVendedor() {
   async function handleGuardarEdicion(anuncioId) {
     await supabase
       .from('anuncios')
-      .update({ precio: parseFloat(nuevoPrecio), estado: nuevoEstado })
+      .update({ precio: parseFloat(nuevoPrecio), estado: nuevoEstado, talla: parseFloat(nuevaTalla),
+    estado_conservacion: nuevaConservacion })
       .eq('id', anuncioId)
+
+      await supabase
+  .from('productos')
+  .update({ descripcion: nuevaDescripcion })
+  .eq('id', anuncios.find(a => a.id === anuncioId)?.producto_id)
 
     if (nuevasImagenes.length > 0) {
       const ordenInicial = imagenesActuales.length
@@ -169,6 +181,23 @@ if (todasImagenes) {
                             <option value="VENDIDO">Vendido</option>
                           </select>
                         </div>
+                        <div className="flex flex-col gap-1">
+  <label className="text-xs text-gray-500">Talla</label>
+  <input type="number" value={nuevaTalla} min="34" max="50" step="0.5"
+    onChange={e => setNuevaTalla(e.target.value)}
+    className="border rounded-lg p-2 w-24 focus:outline-none focus:ring-2 focus:ring-black" />
+</div>
+<div className="flex flex-col gap-1">
+  <label className="text-xs text-gray-500">Conservación</label>
+  <select value={nuevaConservacion} onChange={e => setNuevaConservacion(e.target.value)}
+    className="border rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-black">
+    <option value="NUEVO">Nuevo</option>
+    <option value="COMO_NUEVO">Como nuevo</option>
+    <option value="BUENAS_CONDICIONES">Buenas condiciones</option>
+    <option value="USADO">Usado</option>
+    <option value="MUY_USADO">Muy usado</option>
+  </select>
+</div>
                       </div>
 
                       <div>
