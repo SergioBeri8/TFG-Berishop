@@ -113,77 +113,106 @@ export default function PanelAdmin() {
     CANCELADO: 'bg-red-100 text-red-700'
   }
 
-  if (loading) return <div className="min-h-screen flex items-center justify-center">Cargando...</div>
+  if (loading) return (
+    <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="w-8 h-8 border-4 border-black border-t-transparent rounded-full animate-spin"></div>
+    </div>
+  )
 
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className="min-h-screen bg-gray-50">
       <Navbar />
-      <div className="py-10 px-4">
-        <div className="max-w-5xl mx-auto">
-          <div className="flex justify-between items-center mb-8">
-            <h1 className="text-3xl font-bold">Panel de administración</h1>
-            <div className="bg-white rounded-xl shadow-md px-6 py-4 text-right">
-              <p className="text-xs text-gray-500">Comisiones recaudadas</p>
-              <p className="text-2xl font-bold text-green-600">{comisionTotal} €</p>
-              <p className="text-xs text-gray-400">8% por venta</p>
-            </div>
-          </div>
+      <div className="max-w-5xl mx-auto py-10 px-4">
 
-          {pedidos.length === 0 ? (
-            <div className="text-center text-gray-500 mt-20">
-              <p className="text-xl">No hay pedidos todavía</p>
-            </div>
-          ) : (
-            <div className="flex flex-col gap-4">
-              {pedidos.map(pedido => (
-                <div key={pedido.id} className="bg-white rounded-xl shadow-md p-6">
-                  <div className="flex justify-between items-start">
-                    <div>
-                      <p className="text-sm text-gray-500">{pedido.producto_marca}</p>
-                      <h2 className="text-lg font-bold">{pedido.producto_nombre}</h2>
-                      <p className="text-sm text-gray-500">{pedido.producto_modelo} — Talla {pedido.talla}</p>
-                      <p className="text-sm text-gray-400 mt-2">
-                        <span className="font-medium">Comprador:</span> {pedido.comprador_nombre} ({pedido.comprador_email})
-                      </p>
-                      <p className="text-sm text-gray-400">
-                        <span className="font-medium">Vendedor:</span> {pedido.vendedor_nombre} ({pedido.vendedor_email})
-                      </p>
-                      <p className="text-xs text-gray-400 mt-1">
-                        {new Date(pedido.fecha_pedido).toLocaleDateString('es-ES')}
-                      </p>
-                    </div>
-                    <div className="text-right flex flex-col items-end gap-2">
-                      <p className="text-2xl font-bold">{pedido.precio_final} €</p>
-                      {pedido.estado === 'COMPLETADO' && pedido.comision > 0 && (
-                        <div className="text-xs text-gray-400">
-                          <p>Comisión: {pedido.comision} €</p>
-                          <p>Vendedor recibe: {pedido.importe_vendedor} €</p>
-                        </div>
-                      )}
-                      <span className={`text-xs px-2 py-1 rounded-full ${estadoColor[pedido.estado]}`}>
-                        {pedido.estado.replace('_', ' ')}
-                      </span>
-                      {(pedido.estado === 'PENDIENTE' || pedido.estado === 'EN_VERIFICACION') && (
-                        <div className="flex gap-2 mt-2">
-                          <button
-                            onClick={() => handleVerificar(pedido.id, 'APROBADO')}
-                            className="text-xs bg-green-500 text-white px-3 py-1 rounded-lg hover:bg-green-600 transition">
-                            Aprobar
-                          </button>
-                          <button
-                            onClick={() => handleVerificar(pedido.id, 'RECHAZADO')}
-                            className="text-xs bg-red-500 text-white px-3 py-1 rounded-lg hover:bg-red-600 transition">
-                            Rechazar
-                          </button>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
+        {/* Header */}
+        <div className="flex justify-between items-start mb-8">
+          <div>
+            <h1 className="text-3xl font-bold">Panel de administración</h1>
+            <p className="text-gray-500 mt-1">Gestiona y verifica los pedidos</p>
+          </div>
+          <div className="bg-white rounded-2xl shadow-sm px-6 py-4 text-right">
+            <p className="text-xs text-gray-400 uppercase tracking-widest font-semibold mb-1">Comisiones recaudadas</p>
+            <p className="text-3xl font-bold text-green-600">{comisionTotal} €</p>
+            <p className="text-xs text-gray-400 mt-1">8% por venta completada</p>
+          </div>
         </div>
+
+        {/* Lista pedidos */}
+        {pedidos.length === 0 ? (
+          <div className="text-center py-20 bg-white rounded-2xl shadow-sm">
+            <p className="text-5xl mb-4">📋</p>
+            <p className="text-xl font-semibold text-gray-700">No hay pedidos todavía</p>
+          </div>
+        ) : (
+          <div className="flex flex-col gap-4">
+            {pedidos.map(pedido => (
+              <div key={pedido.id} className="bg-white rounded-2xl shadow-sm p-6 hover:shadow-md transition">
+                <div className="flex justify-between items-start">
+
+                  {/* Info izquierda */}
+                  <div>
+                    <p className="text-xs font-semibold text-gray-400 uppercase tracking-widest mb-1">
+                      {pedido.producto_marca}
+                    </p>
+                    <h2 className="text-lg font-bold">{pedido.producto_nombre}</h2>
+                    <p className="text-sm text-gray-500 mb-3">
+                      {pedido.producto_modelo} — Talla {pedido.talla}
+                    </p>
+                    <div className="flex flex-col gap-1">
+                      <p className="text-sm text-gray-500">
+                        <span className="font-medium text-gray-700">Comprador:</span>{' '}
+                        {pedido.comprador_nombre}
+                        <span className="text-gray-400"> ({pedido.comprador_email})</span>
+                      </p>
+                      <p className="text-sm text-gray-500">
+                        <span className="font-medium text-gray-700">Vendedor:</span>{' '}
+                        {pedido.vendedor_nombre}
+                        <span className="text-gray-400"> ({pedido.vendedor_email})</span>
+                      </p>
+                    </div>
+                    <p className="text-xs text-gray-400 mt-3">
+                      {new Date(pedido.fecha_pedido).toLocaleDateString('es-ES', {
+                        day: 'numeric', month: 'long', year: 'numeric'
+                      })}
+                    </p>
+                  </div>
+
+                  {/* Info derecha */}
+                  <div className="text-right flex flex-col items-end gap-2">
+                    <p className="text-2xl font-bold">{pedido.precio_final} €</p>
+
+                    {pedido.estado === 'COMPLETADO' && pedido.comision > 0 && (
+                      <div className="bg-gray-50 rounded-xl px-4 py-2 text-xs text-gray-500 text-right">
+                        <p>Comisión: <span className="font-semibold text-gray-700">{pedido.comision} €</span></p>
+                        <p>Vendedor recibe: <span className="font-semibold text-gray-700">{pedido.importe_vendedor} €</span></p>
+                      </div>
+                    )}
+
+                    <span className={`text-xs px-3 py-1.5 rounded-full font-semibold ${estadoColor[pedido.estado]}`}>
+                      {pedido.estado.replace('_', ' ')}
+                    </span>
+
+                    {(pedido.estado === 'PENDIENTE' || pedido.estado === 'EN_VERIFICACION') && (
+                      <div className="flex gap-2 mt-1">
+                        <button
+                          onClick={() => handleVerificar(pedido.id, 'APROBADO')}
+                          className="text-xs bg-green-500 text-white px-4 py-1.5 rounded-xl font-semibold hover:bg-green-600 transition">
+                          Aprobar
+                        </button>
+                        <button
+                          onClick={() => handleVerificar(pedido.id, 'RECHAZADO')}
+                          className="text-xs bg-red-500 text-white px-4 py-1.5 rounded-xl font-semibold hover:bg-red-600 transition">
+                          Rechazar
+                        </button>
+                      </div>
+                    )}
+                  </div>
+
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   )
